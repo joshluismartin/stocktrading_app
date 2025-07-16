@@ -10,9 +10,29 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_16_122536) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_16_123714) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "stocks", force: :cascade do |t|
+    t.string "name"
+    t.string "symbol"
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "trades", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "stock_id", null: false
+    t.string "trade_type"
+    t.integer "quantity"
+    t.decimal "price"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stock_id"], name: "index_trades_on_stock_id"
+    t.index ["user_id"], name: "index_trades_on_user_id"
+  end
 
   create_table "users", force: :cascade do |t|
     t.string "email", default: "", null: false
@@ -25,4 +45,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_16_122536) do
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
+
+  add_foreign_key "trades", "stocks"
+  add_foreign_key "trades", "users"
 end

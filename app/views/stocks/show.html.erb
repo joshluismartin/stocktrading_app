@@ -1,4 +1,17 @@
-<h1> Stocks Data </h1>
+<h1> Stocks Data for <%= params[:symbol] %> </h1>
 <pre>
     <%= JSON.pretty_generate(@stock_data) %>
-  </pre>
+</pre>
+<%= form_with url: trades_path, method: :post do |form| %>
+  <%= form.hidden_field :stock_symbol, value: params[:symbol] %>
+  <div>
+    <%= form.label :trade_type, "Trade Type" %>
+    <%= form.select :trade_type, options_for_select([['Buy', 'buy'], ['Sell', 'sell']]) %>
+  </div>
+  <div>
+    <%= form.label :quantity, "Quantity" %>
+    <%= form.number_field :quantity, min: 1 %>
+  </div>
+  <%= form.submit "Submit Trade" %>
+<% end %>
+

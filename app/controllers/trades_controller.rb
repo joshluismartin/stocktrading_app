@@ -1,27 +1,61 @@
 class TradesController < ApplicationController
   before_action :authenticate_user!
+
+  def index
+    @trades = current_user.trades
+  end
+
   def new
     @trade = Trade.new
     @stocks = Stock.all
   end
 
   def create
-    @trade = current_user.trades.build(trade_params)
+    symbol = params[:trade][:stock_symbol]
+    trade_type = params[:trade][:trade_type]
+    quantity = paranms[:trade][:quantity].to_i
+
+    stock_data = AlphaVantage.get_stock_price(symbol)
+    price = extract_latest_price(stock_data)
+
+
+    @trade = current_user.trades.build(
+      stock_symbol: symbol,
+      trade_type: trade_params,
+      quantity: quantity,
+      price: price
+    )
+
     if @trade.save
       redirect_to trades_path, notice: "Trade successful!"
     else
-      render :new
+      redirect_back fallback_location: root_path, alert: "Trade failed."
     end
-  end
-
-  def index
-    @trades = current_user.trades
   end
 
 
   private
 
-  def trade_params
-    params.require(:trade).permit(:stock_id, :trade_type, :quantity, :price)
+  def extract_latest_price(stock_data)
+    time_series_key = nil
+    stock_data.each_key do |key|
+      if key.include?("Time Series")
+        time_series_key = key
+        break
+      end
+    end
+
+    return nil if time_series_key.nil?
+
+    time_series = stock_data[time_series_key]
+
+    latest_time = time_series.keys.sort.last
+
+    latest_data = time_series[latest_time]
+    closing_price = latest_data["4. close"]
+
+    closing_price.to_f
+  rescue
+    nil
   end
 end

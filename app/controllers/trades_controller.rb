@@ -2,7 +2,7 @@ class TradesController < ApplicationController
   before_action :authenticate_user!
 
   def index
-    @trades = current_user.trades
+    @trades = current_user.trades.order(created_at: :desc)
   end
 
   def new
@@ -11,9 +11,12 @@ class TradesController < ApplicationController
   end
 
   def create
-    symbol = params[:trade][:stock_symbol]
+    stock_id = params[:trade][:stock_id]
     trade_type = params[:trade][:trade_type]
     quantity = params[:trade][:quantity].to_i
+
+    stock = Stock.find(stock_id)
+    symbol = stock.symbol
 
     stock_data = AlphaVantage.get_stock_price(symbol)
     price = extract_latest_price(stock_data)
@@ -24,13 +27,27 @@ class TradesController < ApplicationController
       trade_type: trade_type,
       quantity: quantity,
       price: price
-    )
+      )
 
-    if @trade.save
-      redirect_to trades_path, notice: "Trade successful!"
-    else
-      redirect_back fallback_location: root_path, alert: "Trade failed."
+      if @trade.save
+        redirect_to trades_path, notice: "Trade successful!"
+      else
+        redirect_back fallback_location: root_path, alert: "Trade failed."
+      end
     end
+
+  def portfolio
+    holdings = Hash.new(0)
+
+    current_user.trades.each do |trade|
+      if trade.trade_type == "buy"
+        holdings[trade.stock_id] += trade.quantity
+      elsif trade.trade_type == "sell"
+        holdings[trade.stock_id] -= trade.quantity
+      end
+    end
+
+    @portfolio = holdings.select { |stock_id, shares| shares > 0 }
   end
 
 

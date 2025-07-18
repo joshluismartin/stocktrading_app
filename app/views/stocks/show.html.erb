@@ -2,15 +2,19 @@
 <pre>
     <%= JSON.pretty_generate(@stock_data) %>
 </pre>
-<%= form_with url: trades_path, method: :post, scope: :trade do |form| %>
-  <%= form.hidden_field :stock_id, value: @stock.id %>
-  <div>
-    <%= form.label :trade_type, "Trade Type" %>
-    <%= form.select :trade_type, options_for_select([['Buy', 'buy'], ['Sell', 'sell']]) %>
-  </div>
-  <div>
-    <%= form.label :quantity, "Quantity" %>
-    <%= form.number_field :quantity, min: 1 %>
-  </div>
-  <%= form.submit "Submit Trade" %>
+<% if @stock %>
+  <%= form_with url: trades_path, method: :post, scope: :trade do |form| %>
+    <%= form.hidden_field :stock_id, value: @stock.id %>
+    <div>
+      <%= form.label :trade_type, "Trade Type" %>
+      <%= form.select :trade_type, options_for_select([['Buy', 'buy'], ['Sell', 'sell']]) %>
+    </div>
+    <div>
+      <%= form.label :quantity, "Quantity" %>
+      <%= form.number_field :quantity, min: 1 %>
+    </div>
+    <%= form.submit "Submit Trade" %>
+  <% end %>
+<% else %>
+  <p>Stock not found in database.</p>
 <% end %>

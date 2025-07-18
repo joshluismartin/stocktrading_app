@@ -1,0 +1,17 @@
+<h1>My Portfolio</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Stock</th>
+      <th>Shares Owned</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @portfolio.each do |stock_id, shares| %>
+      <tr>
+        <td><%= Stock.find(stock_id).symbol %></td>
+        <td><%= shares %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

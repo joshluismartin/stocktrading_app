@@ -5,6 +5,7 @@ class StocksController < ApplicationController
 
   def show
     symbol = params[:symbol]
+    @stock = Stock.find_or_create_by(symbol: symbol)
     @stock_data = AlphaVantage.get_stock_price(symbol)
   end
 end

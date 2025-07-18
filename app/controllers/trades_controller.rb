@@ -13,15 +13,15 @@ class TradesController < ApplicationController
   def create
     symbol = params[:trade][:stock_symbol]
     trade_type = params[:trade][:trade_type]
-    quantity = paranms[:trade][:quantity].to_i
+    quantity = params[:trade][:quantity].to_i
 
     stock_data = AlphaVantage.get_stock_price(symbol)
     price = extract_latest_price(stock_data)
 
 
     @trade = current_user.trades.build(
-      stock_symbol: symbol,
-      trade_type: trade_params,
+      stock_id: stock_id,
+      trade_type: trade_type,
       quantity: quantity,
       price: price
     )

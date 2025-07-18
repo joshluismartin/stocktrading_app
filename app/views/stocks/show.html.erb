@@ -2,8 +2,8 @@
 <pre>
     <%= JSON.pretty_generate(@stock_data) %>
 </pre>
-<%= form_with url: trades_path, method: :post do |form| %>
-  <%= form.hidden_field :stock_symbol, value: params[:symbol] %>
+<%= form_with url: trades_path, method: :post, scope: :trade do |form| %>
+  <%= form.hidden_field :stock_id, value: @stock.id %>
   <div>
     <%= form.label :trade_type, "Trade Type" %>
     <%= form.select :trade_type, options_for_select([['Buy', 'buy'], ['Sell', 'sell']]) %>
@@ -14,4 +14,3 @@
   </div>
   <%= form.submit "Submit Trade" %>
 <% end %>
-

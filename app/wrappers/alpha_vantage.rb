@@ -16,6 +16,7 @@ class AlphaVantage
     request["x-rapidapi-host"] = "alpha-vantage.p.rapidapi.com"
 
     response = http.request(request)
+   
     if response.code == "200"
       JSON.parse(response.body)
     else
@@ -23,3 +24,4 @@ class AlphaVantage
     end
   end
 end
+

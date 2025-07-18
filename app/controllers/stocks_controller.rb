@@ -4,6 +4,7 @@ class StocksController < ApplicationController
   end
 
   def show
-    @stock = Stock.find(params[:id])
+    symbol = params[:symbol]
+    @stock_data = AlphaVantage.get_stock_price(symbol)
   end
 end

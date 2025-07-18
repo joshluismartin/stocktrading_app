@@ -3,7 +3,7 @@ Rails.application.routes.draw do
   get "trades/create"
   get "trades/index"
   get "stocks/index"
-  get "stocks/show"
+  get "stocks/show", to: "stocks#show"
   devise_for :users
    resources :stocks, only: %i[ index show ]
    resources :trades, only: %i[ new create index ]

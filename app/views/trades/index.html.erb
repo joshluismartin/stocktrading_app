@@ -1,12 +1,18 @@
-<h1> My Trades </h1>
+<h1>My Trades</h1>
+<p>
+  <%= link_to "All", trades_path %> |
+  <%= link_to "Buys", trades_path(type: 'buy') %> |
+  <%= link_to "Sells", trades_path(type: 'sell') %>
+</p>
 <table>
   <thead>
     <tr>
-      <th> Date </th>
-      <th> Stock </th>
-      <th> Type </th>
-      <th> Quantity </th>
-      <th> Price </th>
+      <th>Date</th>
+      <th>Stock</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Details</th>
     </tr>
   </thead>
   <tbody>
@@ -17,6 +23,7 @@
         <td><%= trade.trade_type.capitalize %></td>
         <td><%= trade.quantity %></td>
         <td><%= number_to_currency(trade.price) %></td>
+        <td><%= link_to "View", trade_path(trade) %></td>
       </tr>
     <% end %>
   </tbody>

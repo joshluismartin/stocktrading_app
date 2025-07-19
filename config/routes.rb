@@ -6,7 +6,7 @@ Rails.application.routes.draw do
   get "stocks/show", to: "stocks#show"
   devise_for :users
    resources :stocks, only: %i[ index show ]
-   resources :trades, only: %i[ new create index ]
+   resources :trades, only: %i[ new create index show ]
   get "portfolio", to: "trades#portfolio"
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 

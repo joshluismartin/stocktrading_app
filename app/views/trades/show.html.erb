@@ -1,0 +1,7 @@
+<h1>Trade Details</h1>
+<p>Date: <%= @trade.created_at.strftime("%Y-%m-%d %H:%M") %></p>
+<p>Stock: <%= @trade.stock.symbol %></p>
+<p>Type: <%= @trade.trade_type.capitalize %></p>
+<p>Quantity: <%= @trade.quantity %></p>
+<p>Price: <%= number_to_currency(@trade.price) %></p>
+<%= link_to "Back to Trades", trades_path %>

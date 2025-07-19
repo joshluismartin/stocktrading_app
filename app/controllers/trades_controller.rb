@@ -3,6 +3,13 @@ class TradesController < ApplicationController
 
   def index
     @trades = current_user.trades.order(created_at: :desc)
+    if params[:type].present?
+      @trades = @trades.where(trade_type: params[:type])
+    end
+  end
+
+  def show
+    @trade = current_user.trades.find(params[:id])
   end
 
   def new

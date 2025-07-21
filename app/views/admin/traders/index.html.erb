@@ -1,0 +1,26 @@
+<h1>All Traders</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @traders.each do |trader| %>
+      <tr>
+        <td><%= trader.email %></td>
+        <td><%= trader.status %></td>
+        <td>
+          <%= link_to "Show", admin_trader_path(trader) %> |
+          <%= link_to "Delete", admin_trader_path(trader), method: :delete, data: { confirm: "Are you sure?" } %>
+          <% if trader.status == "pending" %>
+            | <%= link_to "Approve", approve_admin_trader_path(trader), method: :patch %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<%= link_to "View Pending Traders", pending_admin_traders_path %>

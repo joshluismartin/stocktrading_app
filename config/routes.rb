@@ -5,7 +5,9 @@ Rails.application.routes.draw do
   get "trades/index"
   get "stocks/index"
   get "stocks/show", to: "stocks#show"
-  devise_for :users
+  devise_for :users, controllers: {
+    confirmations: "devise/confirmations"
+  }
    resources :stocks, only: %i[ index show ]
    resources :trades, only: %i[ new create index show ]
   get "portfolio", to: "trades#portfolio"

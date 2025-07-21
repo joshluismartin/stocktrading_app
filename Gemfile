@@ -21,6 +21,8 @@ gem "devise"
 
 gem "dotenv-rails"
 
+gem "tailwindcss-rails"
+
 gem "httparty"
 
 gem "pundit"

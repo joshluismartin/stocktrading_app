@@ -3,6 +3,16 @@
     <%= JSON.pretty_generate(@stock_data) %>
 </pre>
 <% if @stock %>
+  <% if @trade && @trade.errors.any? %>
+    <div class="errors">
+      <h2>There were problems with your submission:</h2>
+      <ul>
+        <% @trade.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
   <%= form_with url: trades_path, method: :post, scope: :trade do |form| %>
     <%= form.hidden_field :stock_id, value: @stock.id %>
     <div>

@@ -28,7 +28,7 @@
         |
         <%= link_to "Portfolio", portfolio_path %>
         |
-        <%= link_to "Sign Out", destroy_user_session_path, method: :delete %>
+        <%= link_to "Sign Out", destroy_user_session_path, data: { turbo_method: :delete } %>
       <% else %>
         <%= link_to "Home", root_path %>
         |
@@ -38,10 +38,10 @@
       <% end %>
     </nav>
     <% flash.each do |type, message| %>
-      <div class="flash <%= type %>"><%= message %></div>
-    <% end %>
-    <% flash.each do |type, message| %>
-      <div class="flash <%= type %>"><%= message %></div>
+      <div class="p-4 mb-4 rounded 
+        <%= type == 'notice' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+        <%= message %>
+      </div>
     <% end %>
     <%= yield %>
   </body>

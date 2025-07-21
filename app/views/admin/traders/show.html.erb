@@ -6,4 +6,4 @@
 <% if @trader.status == "pending" %>
   | <%= link_to "Approve", approve_admin_trader_path(@trader), method: :patch %>
 <% end %>
-| <%= link_to "Delete", admin_trader_path(@trader), method: :delete, data: { confirm: "Are you sure?" } %>
+<%= link_to "Delete", admin_trader_path(@trader), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>

@@ -4,6 +4,14 @@
   <%= link_to "Buys", trades_path(type: 'buy') %> |
   <%= link_to "Sells", trades_path(type: 'sell') %>
 </p>
+<h2>Summary</h2>
+<ul>
+  <li>Total Trades: <%= @trades.count %></li>
+  <li>Total Shares Bought: <%= @total_buys %></li>
+  <li>Total Shares Sold: <%= @total_sells %></li>
+  <li>Total Spent: <%= number_to_currency(@total_spent) %></li>
+  <li>Total Earned: <%= number_to_currency(@total_earned) %></li>
+</ul>
 <table>
   <thead>
     <tr>

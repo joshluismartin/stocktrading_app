@@ -6,6 +6,11 @@ class TradesController < ApplicationController
     if params[:type].present?
       @trades = @trades.where(trade_type: params[:type])
     end
+
+    @total_buys = current_user.trades.where(trade_type: "buy").sum(:quantity)
+    @total_sells = current_user.trades.where(trade_type: "sell").sum(:quantity)
+    @total_spent = current_user.trades.where(trade_type: "buy").sum("quantity * price")
+    @total_earned = current_user.trades.where(trade_type: "sell").sum("quantity * price")
   end
 
   def show
@@ -14,7 +19,6 @@ class TradesController < ApplicationController
 
   def new
     @trade = Trade.new
-    @stocks = Stock.all
   end
 
   def create
@@ -28,24 +32,22 @@ class TradesController < ApplicationController
     stock_data = AlphaVantage.get_stock_price(symbol)
     price = extract_latest_price(stock_data)
 
-
     @trade = current_user.trades.build(
       stock_id: stock_id,
       trade_type: trade_type,
       quantity: quantity,
       price: price
-      )
+    )
 
-      if @trade.save
-        redirect_to trades_path, notice: "Trade successful!"
-      else
-        redirect_back fallback_location: root_path, alert: "Trade failed."
-      end
+    if @trade.save
+      redirect_to trades_path, notice: "Trade successful"
+    else
+      redirect_back fallback_location: root_path, alert: "Trade failed."
     end
+  end
 
   def portfolio
     holdings = Hash.new(0)
-
     current_user.trades.each do |trade|
       if trade.trade_type == "buy"
         holdings[trade.stock_id] += trade.quantity
@@ -55,30 +57,32 @@ class TradesController < ApplicationController
     end
 
     @portfolio = holdings.select { |stock_id, shares| shares > 0 }
-  end
 
+    @stocks = Stock.where(id: @portfolio.keys).index_by(&:id)
+
+    @current_prices = {}
+    @portfolio.each_key do |stock_id|
+      stock = @stocks[stock_id]
+      symbol = stock&.symbol
+      if symbol
+        stock_data = AlphaVantage.get_stock_price(symbol)
+        @current_prices[stock_id] = extract_latest_price(stock_data)
+      else
+        @current_prices[stock_id] = nil
+      end
+    end
+  end
 
   private
 
   def extract_latest_price(stock_data)
-    time_series_key = nil
-    stock_data.each_key do |key|
-      if key.include?("Time Series")
-        time_series_key = key
-        break
-      end
-    end
-
-    return nil if time_series_key.nil?
+    time_series_key = stock_data.keys.find { |key| key.include?("Time Series") }
+    return nil unless time_series_key
 
     time_series = stock_data[time_series_key]
-
     latest_time = time_series.keys.sort.last
-
     latest_data = time_series[latest_time]
-    closing_price = latest_data["4. close"]
-
-    closing_price.to_f
+    latest_data["4. close"].to_f
   rescue
     nil
   end

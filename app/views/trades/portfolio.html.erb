@@ -4,13 +4,24 @@
     <tr>
       <th>Stock</th>
       <th>Shares Owned</th>
+      <th>Current Price</th>
+      <th>Total Value</th>
     </tr>
   </thead>
   <tbody>
     <% @portfolio.each do |stock_id, shares| %>
       <tr>
-        <td><%= Stock.find(stock_id).symbol %></td>
+        <td><%= @stocks[stock_id].symbol if @stocks[stock_id] %></td>
         <td><%= shares %></td>
+        <% price = @current_prices[stock_id] %>
+        <td><%= number_to_currency(price) if price %></td>
+        <td>
+          <% if price %>
+            <%= number_to_currency(price * shares) %>
+          <% else %>
+            N/A
+          <% end %>
+        </td>
       </tr>
     <% end %>
   </tbody>

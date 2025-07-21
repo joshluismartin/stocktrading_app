@@ -1,0 +1,5 @@
+<% if user_signed_in? %>
+  <p>Status: <%= current_user.status.capitalize %></p>
+<% else %>
+  <p>Welcome! Please sign in or sign up.</p>
+<% end %>

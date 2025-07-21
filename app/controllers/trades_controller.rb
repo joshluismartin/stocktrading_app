@@ -1,5 +1,6 @@
 class TradesController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_approved_user
 
   def index
     @trades = current_user.trades.order(created_at: :desc)
@@ -74,6 +75,12 @@ class TradesController < ApplicationController
   end
 
   private
+
+  def require_approved_user
+    unless current_user.status == "approved"
+      redirect_to root_path, alert: "Your account is pending approval."
+    end
+  end
 
   def extract_latest_price(stock_data)
     time_series_key = stock_data.keys.find { |key| key.include?("Time Series") }

@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  get "home/index"
   get "trades/new"
   get "trades/create"
   get "trades/index"
@@ -19,5 +20,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  root "stocks#index"
+  root "home#index"
 end

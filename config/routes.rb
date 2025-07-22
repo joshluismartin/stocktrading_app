@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get "portfolio", to: "trades#portfolio"
 
   namespace :admin do
+    get "trades/index"
     resources :traders, only: [ :index, :show, :destroy ] do
       collection do
         get :pending
@@ -18,6 +19,7 @@ Rails.application.routes.draw do
         patch :approve
       end
     end
+    resources :trades, only: [ :index ]
   end
 
   get "up" => "rails/health#show", as: :rails_health_check

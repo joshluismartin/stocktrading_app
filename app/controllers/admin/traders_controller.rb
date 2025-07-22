@@ -3,7 +3,7 @@ class Admin::TradersController < ApplicationController
   before_action :require_admin
 
   def index
-    @traders = User.where(admin: false)
+    @trades = Trade.includes(:user, :stock).order(created_at: :desc)
   end
 
   def show

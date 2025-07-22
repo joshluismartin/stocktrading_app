@@ -1,0 +1,25 @@
+<h1>All Transactions</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Trader</th>
+      <th>Stock</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Price</th>
+      <th>Date</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @trades.each do |trade| %>
+      <tr>
+        <td><%= trade.user.email %></td>
+        <td><%= trade.stock.symbol %></td>
+        <td><%= trade.trade_type %></td>
+        <td><%= trade.quantity %></td>
+        <td><%= number_to_currency(trade.price) %></td>
+        <td><%= trade.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

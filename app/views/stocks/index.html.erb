@@ -1,2 +1,22 @@
-<h1>Stocks#index</h1>
-<p>Find me in app/views/stocks/index.html.erb</p>
+<h1>Stocks</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Symbol</th>
+      <th>Name</th>
+      <th>Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stocks.each do |stock| %>
+      <tr>
+        <td><%= stock.symbol %></td>
+        <td><%= stock.name %></td>
+        <td>
+          <% price = @latest_prices[stock.id] %>
+          <%= price ? number_to_currency(price) : "N/A" %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

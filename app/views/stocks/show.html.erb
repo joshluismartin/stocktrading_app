@@ -1,7 +1,9 @@
-<h1> Stocks Data for <%= params[:symbol] %> </h1>
-<pre>
-    <%= JSON.pretty_generate(@stock_data) %>
-</pre>
+<h1>Stock Data for <%= @stock.symbol %></h1>
+<% latest_price = extract_latest_price(@stock_data) %>
+<p>
+  <strong>Price:</strong>
+  <%= latest_price ? number_to_currency(latest_price) : "N/A" %>
+</p>
 <% if @stock %>
   <% if @trade && @trade.errors.any? %>
     <div class="errors">

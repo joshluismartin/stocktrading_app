@@ -104,16 +104,4 @@ class TradesController < ApplicationController
       redirect_to root_path, alert: "Your account is pending approval."
     end
   end
-
-  def extract_latest_price(stock_data)
-    time_series_key = stock_data.keys.find { |key| key.include?("Time Series") }
-    return nil unless time_series_key
-
-    time_series = stock_data[time_series_key]
-    latest_time = time_series.keys.sort.last
-    latest_data = time_series[latest_time]
-    latest_data["4. close"].to_f
-  rescue
-    nil
-  end
 end

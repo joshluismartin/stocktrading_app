@@ -2,6 +2,17 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   before_action :restrict_unapproved_trader, if: :trader_controller?
+  def extract_latest_price(stock_data)
+    time_series_key = stock_data.keys.find { |key| key.include?("Time Series") }
+    return nil unless time_series_key
+
+    time_series = stock_data[time_series_key]
+    latest_time = time_series.keys.sort.last
+    latest_data = time_series[latest_time]
+    latest_data["4. close"].to_f
+  rescue
+    nil
+  end
 
   private
 

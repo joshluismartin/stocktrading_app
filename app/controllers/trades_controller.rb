@@ -41,6 +41,12 @@ class TradesController < ApplicationController
     )
 
     if @trade.save
+      if trade_type == "buy"
+        current_user.balance -= price * quantity
+      elsif trade_type == "sell"
+        current_user.balance += price * quantity
+      end
+      current_user.save!
       redirect_to trades_path, notice: "Trade successful"
     else
       redirect_back fallback_location: root_path, alert: "Trade failed."

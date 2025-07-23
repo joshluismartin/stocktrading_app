@@ -16,7 +16,7 @@
           <%= link_to "Show", admin_trader_path(trader) %> |
           <%= link_to "Delete", admin_trader_path(trader), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
           <% if trader.status == "pending" %>
-            | <%= link_to "Approve", approve_admin_trader_path(trader), method: :patch %>
+            | <%= link_to "Approve", approve_admin_trader_path(trader), data: { turbo_method: :patch } %>
           <% end %>
         </td>
       </tr>

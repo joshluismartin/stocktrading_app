@@ -3,7 +3,7 @@ class Admin::TradersController < ApplicationController
   before_action :require_admin
 
   def index
-    @trades = Trade.includes(:user, :stock).order(created_at: :desc)
+    @traders = User.where(admin: false)
   end
 
   def show
@@ -11,9 +11,13 @@ class Admin::TradersController < ApplicationController
   end
 
   def destroy
-    @trader = User.find(parmams[:id])
-    @trader.destroy
-    redirect_to admin_traders_path, notice: "Trader deleted."
+    @trader = User.find(params[:id])
+    if @trader.trades.exists?
+      redirect_to admin_traders_path, alert: "Cannot delete trader with existing trades."
+    else
+      @trader.destroy
+      redirect_to admin_traders_path, notice: "Trader deleted."
+    end
   end
 
   def pending

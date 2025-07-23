@@ -19,6 +19,8 @@ gem "jbuilder"
 
 gem "devise"
 
+gem "kaminari"
+
 gem "dotenv-rails"
 
 gem "tailwindcss-rails"

@@ -3,7 +3,7 @@ class TradesController < ApplicationController
   before_action :require_approved_user
 
   def index
-    @trades = current_user.trades.order(created_at: :desc)
+    @trades = current_user.trades.order(created_at: :desc).page(params[:page]).per(10)
     if params[:type].present?
       @trades = @trades.where(trade_type: params[:type])
     end

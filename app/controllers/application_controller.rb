@@ -1,7 +1,9 @@
 class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
+  helper_method :extract_latest_price
   before_action :restrict_unapproved_trader, if: :trader_controller?
+
   def extract_latest_price(stock_data)
     time_series_key = stock_data.keys.find { |key| key.include?("Time Series") }
     return nil unless time_series_key

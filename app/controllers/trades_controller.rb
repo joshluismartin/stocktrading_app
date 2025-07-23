@@ -32,6 +32,23 @@ class TradesController < ApplicationController
 
     stock_data = AlphaVantage.get_stock_price(symbol)
     price = extract_latest_price(stock_data)
+    total_cost = price * quantity
+
+    if trade_type == "buy" && current_user.balance < total_cost
+      redirect_back fallback_location: trades_path, alert: "You don't have enough balance to buy these shares"
+      return
+    end
+
+    if trade_type == "sell"
+      total_bought == current_user.trades.where(stock_id: stock_id, trade_type: "buy").sum(:quantity)
+      total_sold == current_user.trades.where(stock_id: stock_id, trade_type: "sell").sum(:quantity)
+      shares_owned = total_bought - total_sold
+
+      if quantity > shares_owned
+        redirect_fall back_location: trades_path, alert: "You don't have enough shares to sell"
+        return
+      end
+    end
 
     @trade = current_user.trades.build(
       stock_id: stock_id,

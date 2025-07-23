@@ -8,6 +8,10 @@ class TradesController < ApplicationController
       @trades = @trades.where(trade_type: params[:type])
     end
 
+    if params[:symbol].present?
+      @trades = @trades.joins(:stock).where("stocks.symbol ILIKE ?", "%#{params[:symbol]}%")
+    end
+
     @total_buys = current_user.trades.where(trade_type: "buy").sum(:quantity)
     @total_sells = current_user.trades.where(trade_type: "sell").sum(:quantity)
     @total_spent = current_user.trades.where(trade_type: "buy").sum("quantity * price")

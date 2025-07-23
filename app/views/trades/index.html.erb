@@ -12,6 +12,11 @@
   <li>Total Spent: <%= number_to_currency(@total_spent) %></li>
   <li>Total Earned: <%= number_to_currency(@total_earned) %></li>
 </ul>
+<%= form_with url: trades_path, method: :get, local: true do |form| %>
+  <%= form.label :symbol, "Stock Symbol:" %>
+  <%= form.text_field :symbol, value: params[:symbol], class: "border rounded px-2 py-1" %>
+  <%= form.submit "Search", class: "bg-blue-500 text-white px-4 py-1 rounded" %>
+<% end %>
 <table>
   <thead>
     <tr>
@@ -36,3 +41,4 @@
     <% end %>
   </tbody>
 </table>
+<%= paginate @trades %>

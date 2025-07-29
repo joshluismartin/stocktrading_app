@@ -1,25 +1,33 @@
-<h1>All Transactions</h1>
-<table>
-  <thead>
+<h1>All Trades (Admin)</h1>
+<%= form_with url: admin_trades_path, method: :get, local: true do |form| %>
+  <%= form.label :symbol, "Stock Symbol:" %>
+  <%= form.text_field :symbol, value: params[:symbol], class: "border rounded px-2 py-1" %>
+  <%= form.label :email, "Trader Email:" %>
+  <%= form.text_field :email, value: params[:email], class: "border rounded px-2 py-1" %>
+  <%= form.submit "Search", class: "bg-blue-500 text-white px-4 py-1 rounded" %>
+<% end %>
+<table class="min-w-full divide-y divide-gray-200 mt-4">
+  <thead class="bg-gray-100">
     <tr>
-      <th>Trader</th>
-      <th>Stock</th>
-      <th>Type</th>
-      <th>Quantity</th>
-      <th>Price</th>
-      <th>Date</th>
+      <th class="px-4 py-2">Date</th>
+      <th class="px-4 py-2">Trader Email</th>
+      <th class="px-4 py-2">Stock</th>
+      <th class="px-4 py-2">Type</th>
+      <th class="px-4 py-2">Quantity</th>
+      <th class="px-4 py-2">Price</th>
     </tr>
   </thead>
   <tbody>
     <% @trades.each do |trade| %>
-      <tr>
-        <td><%= trade.user.email %></td>
-        <td><%= trade.stock.symbol %></td>
-        <td><%= trade.trade_type %></td>
-        <td><%= trade.quantity %></td>
-        <td><%= number_to_currency(trade.price) %></td>
-        <td><%= trade.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+      <tr class="hover:bg-gray-50">
+        <td class="border px-4 py-2"><%= trade.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+        <td class="border px-4 py-2"><%= trade.user.email %></td>
+        <td class="border px-4 py-2"><%= trade.stock.symbol %></td>
+        <td class="border px-4 py-2"><%= trade.trade_type.capitalize %></td>
+        <td class="border px-4 py-2"><%= trade.quantity %></td>
+        <td class="border px-4 py-2"><%= number_to_currency(trade.price) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+<%= paginate @trades %>

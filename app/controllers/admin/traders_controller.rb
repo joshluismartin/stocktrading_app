@@ -10,6 +10,34 @@ class Admin::TradersController < ApplicationController
     @trader = User.find(params[:id])
   end
 
+  def new
+    @trader = User.new
+  end
+
+  def create
+    @trader = User.new(trader_params)
+    @trader.admin = false
+    @trader.status = "pending" # or "approved" if you want to skip approval
+    if @trader.save
+      redirect_to admin_trader_path(@trader), notice: "Trader created successfully!"
+    else
+      render :new
+    end
+  end
+
+  def edit
+    @trader = User.find(params[:id])
+  end
+
+  def update
+    @trader = User.find(params[:id])
+    if @trader.update(trader_params)
+      redirect_to admin_trader_path(@trader), notice: "Trader updated successfully!"
+    else
+      render :edit
+    end
+  end
+
   def destroy
     @trader = User.find(params[:id])
     if @trader.trades.exists?
@@ -31,10 +59,13 @@ class Admin::TradersController < ApplicationController
     redirect_to admin_trader_path(@trader), notice: "Trader approved!"
   end
 
-
   private
 
   def require_admin
     redirect_to root_path, alert: "Not authorized" unless current_user.admin?
+  end
+
+  def trader_params
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :status)
   end
 end

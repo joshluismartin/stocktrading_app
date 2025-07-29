@@ -1,5 +1,5 @@
 <h1>Edit Trader</h1>
-<%= form_with model: [:admin, @trader], local: true do |form| %>
+<%= form_with url: admin_trader_path(@trader), model: @trader, local: true do |form| %>
   <div>
     <%= form.label :name %>
     <%= form.text_field :name %>

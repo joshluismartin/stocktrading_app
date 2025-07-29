@@ -1,4 +1,5 @@
 <h1>All Traders</h1>
+<%= link_to "New Trader", new_admin_trader_path %>
 <table>
   <thead>
     <tr>
@@ -14,6 +15,7 @@
         <td><%= trader.status %></td>
         <td>
           <%= link_to "Show", admin_trader_path(trader) %> |
+          <%= link_to "Edit", edit_admin_trader_path(trader) %> |
           <%= link_to "Delete", admin_trader_path(trader), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
           <% if trader.status == "pending" %>
             | <%= link_to "Approve", approve_admin_trader_path(trader), data: { turbo_method: :patch } %>

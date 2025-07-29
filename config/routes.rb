@@ -10,8 +10,7 @@ Rails.application.routes.draw do
   get "portfolio", to: "trades#portfolio"
 
   namespace :admin do
-    get "trades/index"
-    resources :traders, only: [ :index, :show, :destroy ] do
+    resources :traders do
       collection do
         get :pending
       end

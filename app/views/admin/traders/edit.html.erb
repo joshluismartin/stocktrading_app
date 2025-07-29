@@ -13,6 +13,10 @@
     <%= form.select :status, [["Pending", "pending"], ["Approved", "approved"]] %>
   </div>
   <div>
+    <%= form.label :admin, "Is Admin?" %>
+    <%= form.check_box :admin %>
+  </div>
+  <div>
     <%= form.submit "Update Trader" %>
   </div>
 <% end %>

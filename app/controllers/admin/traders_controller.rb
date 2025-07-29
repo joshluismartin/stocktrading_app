@@ -3,7 +3,7 @@ class Admin::TradersController < ApplicationController
   before_action :require_admin
 
   def index
-    @traders = User.where(admin: false)
+    @traders = User.all
   end
 
   def show
@@ -66,6 +66,6 @@ class Admin::TradersController < ApplicationController
   end
 
   def trader_params
-    params.require(:user).permit(:name, :email, :password, :password_confirmation, :status)
+    params.require(:user).permit(:name, :email, :password, :password_confirmation, :status, :admin)
   end
 end

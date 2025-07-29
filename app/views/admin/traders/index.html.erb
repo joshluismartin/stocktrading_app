@@ -5,6 +5,7 @@
     <tr>
       <th>Email</th>
       <th>Status</th>
+      <th>Admin</th>
       <th>Actions</th>
     </tr>
   </thead>
@@ -13,6 +14,7 @@
       <tr>
         <td><%= trader.email %></td>
         <td><%= trader.status %></td>
+        <td><%= trader.admin? ? "Yes" : "No" %></td>
         <td>
           <%= link_to "Show", admin_trader_path(trader) %> |
           <%= link_to "Edit", edit_admin_trader_path(trader) %> |

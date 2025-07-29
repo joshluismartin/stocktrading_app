@@ -1,7 +1,11 @@
 class User < ApplicationRecord
-  # Include default devise modules. Others available are:
   has_many :trades
-  # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
+
+  # Devise modules
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable, :confirmable
+
+  # Beginner-friendly validations
+  validates :email, presence: true, uniqueness: true
+  validates :status, presence: true # assuming you use status for approval
 end

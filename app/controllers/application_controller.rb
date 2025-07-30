@@ -1,6 +1,4 @@
 class ApplicationController < ActionController::Base
-  allow_browser versions: :modern
-
   helper_method :extract_latest_price
   before_action :restrict_unapproved_trader, if: :trader_controller?
 

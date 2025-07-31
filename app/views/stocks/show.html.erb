@@ -1,32 +1,207 @@
-<h1>Stock Data for <%= @stock.symbol %></h1>
-<% latest_price = extract_latest_price(@stock_data) %>
-<p>
-  <strong>Price:</strong>
-  <%= latest_price ? number_to_currency(latest_price) : "N/A" %>
-</p>
-<% if @stock %>
-  <% if @trade && @trade.errors.any? %>
-    <div class="errors">
-      <h2>There were problems with your submission:</h2>
-      <ul>
-        <% @trade.errors.full_messages.each do |msg| %>
-          <li><%= msg %></li>
+<div class="max-w-6xl mx-auto">
+  <% latest_price = extract_latest_price(@stock_data) %>
+  
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-4xl font-bold text-green-800 mb-2 flex items-center">
+          <span class="mr-3 text-green-600">📈</span>
+          <%= @stock.symbol %>
+        </h1>
+        <p class="text-xl text-green-600"><%= @stock.name %></p>
+      </div>
+      <div class="text-right">
+        <%= link_to "← Back to Stocks", stocks_path, class: "bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-lg font-medium transition-all duration-200" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stock Price Card -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <div class="lg:col-span-2">
+      <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-8 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-100 text-lg font-medium mb-2">Current Stock Price</p>
+            <p class="text-5xl font-bold mb-4">
+              <%= latest_price ? number_to_currency(latest_price) : "Loading..." %>
+            </p>
+            <% if latest_price %>
+              <p class="text-green-100">Per Share • Real-time data</p>
+            <% else %>
+              <p class="text-green-100">Fetching latest price...</p>
+            <% end %>
+          </div>
+          <div class="text-6xl opacity-80">💹</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Quick Stats -->
+    <div class="space-y-4">
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-600 text-sm font-medium">Symbol</p>
+            <p class="text-2xl font-bold text-green-800"><%= @stock.symbol %></p>
+          </div>
+          <div class="text-3xl text-green-500">🏷️</div>
+        </div>
+      </div>
+      
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-600 text-sm font-medium">Market Status</p>
+            <p class="text-lg font-bold text-green-800">Active</p>
+          </div>
+          <div class="text-3xl text-green-500">🟢</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @stock %>
+    <!-- Error Messages -->
+    <% if @trade && @trade.errors.any? %>
+      <div class="bg-red-50 border border-red-200 rounded-xl p-6 mb-8">
+        <div class="flex items-center mb-4">
+          <span class="text-2xl mr-3">⚠️</span>
+          <h3 class="text-lg font-semibold text-red-800">There were problems with your submission:</h3>
+        </div>
+        <ul class="space-y-2">
+          <% @trade.errors.full_messages.each do |msg| %>
+            <li class="text-red-700 flex items-center">
+              <span class="mr-2">•</span>
+              <%= msg %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <!-- Trading Interface -->
+    <div class="bg-white rounded-xl shadow-lg border border-green-100">
+      <div class="bg-gradient-to-r from-green-600 to-green-700 px-8 py-6 rounded-t-xl">
+        <h2 class="text-2xl font-semibold text-white flex items-center">
+          <span class="mr-3">💰</span>
+          Trade <%= @stock.symbol %>
+        </h2>
+        <p class="text-green-100 mt-2">Buy or sell shares of this stock</p>
+      </div>
+
+      <div class="p-8">
+        <%= form_with url: trades_path, method: :post, scope: :trade, class: "space-y-6" do |form| %>
+          <%= form.hidden_field :stock_id, value: @stock.id %>
+          
+          <!-- Trade Type Selection -->
+          <div>
+            <%= form.label :trade_type, "Trade Type", class: "block text-sm font-semibold text-green-800 mb-3" %>
+            <div class="grid grid-cols-2 gap-4">
+              <label class="relative">
+                <%= form.radio_button :trade_type, "buy", class: "sr-only peer", checked: true %>
+                <div class="bg-white border-2 border-green-200 rounded-xl p-6 text-center cursor-pointer transition-all duration-200 peer-checked:border-green-600 peer-checked:bg-green-50 hover:border-green-400">
+                  <div class="text-3xl mb-2">📈</div>
+                  <div class="font-bold text-green-800">BUY</div>
+                  <div class="text-sm text-green-600">Purchase shares</div>
+                </div>
+              </label>
+              
+              <label class="relative">
+                <%= form.radio_button :trade_type, "sell", class: "sr-only peer" %>
+                <div class="bg-white border-2 border-green-200 rounded-xl p-6 text-center cursor-pointer transition-all duration-200 peer-checked:border-red-600 peer-checked:bg-red-50 hover:border-red-400">
+                  <div class="text-3xl mb-2">📉</div>
+                  <div class="font-bold text-red-800">SELL</div>
+                  <div class="text-sm text-red-600">Sell shares</div>
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Quantity Input -->
+          <div>
+            <%= form.label :quantity, "Number of Shares", class: "block text-sm font-semibold text-green-800 mb-3" %>
+            <div class="relative">
+              <%= form.number_field :quantity, min: 1, placeholder: "Enter quantity", class: "w-full px-4 py-4 text-lg border border-green-200 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" %>
+              <div class="absolute inset-y-0 right-0 flex items-center pr-4">
+                <span class="text-green-600 font-medium">shares</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Trade Summary -->
+          <% if latest_price %>
+            <div class="bg-green-50 rounded-xl p-6 border border-green-200">
+              <h3 class="font-semibold text-green-800 mb-4 flex items-center">
+                <span class="mr-2">📊</span>
+                Trade Summary
+              </h3>
+              <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span class="text-green-600">Price per share:</span>
+                  <span class="font-bold text-green-800 ml-2"><%= number_to_currency(latest_price) %></span>
+                </div>
+                <div>
+                  <span class="text-green-600">Your balance:</span>
+                  <span class="font-bold text-green-800 ml-2"><%= number_to_currency(current_user.balance) %></span>
+                </div>
+              </div>
+              <div class="mt-4 pt-4 border-t border-green-200">
+                <div class="flex justify-between items-center">
+                  <span class="text-green-600">Estimated total:</span>
+                  <span class="text-xl font-bold text-green-800" id="trade-total">$0.00</span>
+                </div>
+              </div>
+            </div>
+          <% end %>
+
+          <!-- Submit Button -->
+          <div class="flex justify-center pt-4">
+            <%= form.submit "Execute Trade", class: "bg-green-600 hover:bg-green-700 text-white px-12 py-4 rounded-xl font-bold text-lg transition-all duration-200 hover:shadow-lg transform hover:-translate-y-1 flex items-center" %>
+          </div>
         <% end %>
-      </ul>
+      </div>
+    </div>
+
+    <div class="mt-8 flex justify-center space-x-4">
+      <%= link_to "💼 View Portfolio", "/portfolio", class: "bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" %>
+      <%= link_to "📋 Trade History", "/trades", class: "bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" %>
+    </div>
+
+  <% else %>
+    <!-- Stock Not Found -->
+    <div class="bg-white rounded-xl shadow-lg border border-red-200 p-12 text-center">
+      <div class="text-6xl mb-4">❌</div>
+      <h3 class="text-2xl font-semibold text-red-800 mb-4">Stock Not Found</h3>
+      <p class="text-red-600 mb-8">The requested stock could not be found in our database.</p>
+      <div class="flex justify-center space-x-4">
+        <%= link_to "Browse Stocks", stocks_path, class: "bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+        <%= link_to "Go to Dashboard", root_path, class: "bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+      </div>
     </div>
   <% end %>
-  <%= form_with url: trades_path, method: :post, scope: :trade do |form| %>
-    <%= form.hidden_field :stock_id, value: @stock.id %>
-    <div>
-      <%= form.label :trade_type, "Trade Type" %>
-      <%= form.select :trade_type, options_for_select([['Buy', 'buy'], ['Sell', 'sell']]) %>
-    </div>
-    <div>
-      <%= form.label :quantity, "Quantity" %>
-      <%= form.number_field :quantity, min: 1 %>
-    </div>
-    <%= form.submit "Submit Trade" %>
-  <% end %>
-<% else %>
-  <p>Stock not found in database.</p>
+</div>
+
+<% if latest_price %>
+  <script>
+    // Calculate trade total dynamically
+    const quantityInput = document.querySelector('input[name="trade[quantity]"]');
+    const tradeTotal = document.getElementById('trade-total');
+    const pricePerShare = <%= latest_price %>;
+    
+    function updateTotal() {
+      const quantity = parseInt(quantityInput.value) || 0;
+      const total = quantity * pricePerShare;
+      tradeTotal.textContent = new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(total);
+    }
+    
+    if (quantityInput && tradeTotal) {
+      quantityInput.addEventListener('input', updateTotal);
+      updateTotal(); // Initial calculation
+    }
+  </script>
 <% end %>

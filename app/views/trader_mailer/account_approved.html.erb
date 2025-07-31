@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Approved - StockBit</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; }
+    .button { display: inline-block; background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+    .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🎉 Welcome to StockBit!</h1>
+      <p>Your trading account has been approved</p>
+    </div>
+    
+    <div class="content">
+      <h2>Hello <%= @trader.name.present? ? @trader.name : @trader.email %>!</h2>
+      
+      <p>Great news! Your StockBit trading account has been <strong>approved</strong> and is now ready for use.</p>
+      
+      <p>You can now:</p>
+      <ul>
+        <li>🔍 Search and discover stocks with real-time data</li>
+        <li>💹 Buy and sell stocks with our intelligent trading platform</li>
+        <li>📊 Track your portfolio performance with detailed analytics</li>
+        <li>💰 Monitor your gains and losses in real-time</li>
+      </ul>
+      
+      <div style="text-align: center;">
+        <a href="<%= @login_url %>" class="button">Start Trading Now</a>
+      </div>
+      
+      <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+      
+      <p>Happy trading!</p>
+      <p><strong>The StockBit Team</strong></p>
+    </div>
+    
+    <div class="footer">
+      <p>This email was sent to <%= @trader.email %> because your trading account was approved.</p>
+    </div>
+  </div>
+</body>
+</html>

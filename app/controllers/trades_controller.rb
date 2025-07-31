@@ -27,15 +27,38 @@ class TradesController < ApplicationController
   end
 
   def create
-    stock_id = params[:trade][:stock_id]
-    trade_type = params[:trade][:trade_type]
-    quantity = params[:trade][:quantity].to_i
+    if params[:trade].present?
 
-    stock = Stock.find(stock_id)
-    symbol = stock.symbol
+      stock_id = params[:trade][:stock_id]
+      trade_type = params[:trade][:trade_type]
+      quantity = params[:trade][:quantity].to_i
 
-    stock_data = AlphaVantage.get_stock_price(symbol)
-    price = extract_latest_price(stock_data)
+      stock = Stock.find(stock_id)
+      symbol = stock.symbol
+      stock_data = AlphaVantage.get_stock_price(symbol)
+      price = extract_latest_price(stock_data)
+
+
+      if price.nil?
+        redirect_back fallback_location: root_path, alert: "Unable to fetch current stock price. Please try again later."
+        return
+      end
+    elsif params[:symbol].present? && params[:price].present?
+
+      symbol = params[:symbol].upcase
+      quantity = params[:quantity].to_i
+      price = params[:price].to_f
+      trade_type = "buy"
+
+      stock = Stock.find_or_create_by(symbol: symbol) do |s|
+        s.name = symbol
+      end
+      stock_id = stock.id
+    else
+      redirect_back fallback_location: root_path, alert: "Invalid trade parameters."
+      return
+    end
+
     total_cost = price * quantity
 
     if trade_type == "buy" && current_user.balance < total_cost
@@ -75,32 +98,70 @@ class TradesController < ApplicationController
   end
 
   def portfolio
-    holdings = Hash.new(0)
-    current_user.trades.each do |trade|
-      if trade.trade_type == "buy"
-        holdings[trade.stock_id] += trade.quantity
-      elsif trade.trade_type == "sell"
-        holdings[trade.stock_id] -= trade.quantity
+    shares_i_own = {}
+
+    current_user.trades.includes(:stock).each do |trade|
+      stock_id = trade.stock_id
+
+      if shares_i_own[stock_id]
+
+        if trade.trade_type == "buy"
+          shares_i_own[stock_id] += trade.quantity
+        else
+          shares_i_own[stock_id] -= trade.quantity
+        end
+      else
+        if trade.trade_type == "buy"
+          shares_i_own[stock_id] = trade.quantity
+        else
+          shares_i_own[stock_id] = -trade.quantity
+        end
       end
     end
 
-    @portfolio = holdings.select { |stock_id, shares| shares > 0 }
+    @portfolio = shares_i_own.select { |stock_id, quantity| quantity > 0 }
 
     @stocks = Stock.where(id: @portfolio.keys).index_by(&:id)
-
     @current_prices = {}
-    @portfolio.each_key do |stock_id|
-      stock = @stocks[stock_id]
-      symbol = stock&.symbol
-      if symbol
-        stock_data = AlphaVantage.get_stock_price(symbol)
-        @current_prices[stock_id] = extract_latest_price(stock_data)
-      else
-        @current_prices[stock_id] = nil
-      end
-    end
-  end
 
+    @stocks.each do |stock_id, stock|
+      stock_data = AlphaVantage.get_stock_price(stock.symbol)
+      @current_prices[stock_id] = extract_latest_price(stock_data)
+    end
+
+    @total_money_i_spent = 0
+    @total_current_value = 0
+    @stock_performance = {}
+
+    @portfolio.each do |stock_id, shares_i_own|
+      stock = @stocks[stock_id]
+      current_price = @current_prices[stock_id]
+
+      my_buy_trades = current_user.trades.where(stock_id: stock_id, trade_type: "buy")
+      money_i_spent_on_this_stock = my_buy_trades.sum { |trade| trade.price * trade.quantity }
+
+      current_worth_of_this_stock = current_price ? (current_price * shares_i_own) : 0
+
+      profit_or_loss = current_worth_of_this_stock - money_i_spent_on_this_stock
+      profit_or_loss_percentage = money_i_spent_on_this_stock > 0 ? ((profit_or_loss / money_i_spent_on_this_stock) * 100) : 0
+
+      @stock_performance[stock_id] = {
+        total_invested: money_i_spent_on_this_stock,
+        current_value: current_worth_of_this_stock,
+        gain_loss: profit_or_loss,
+        gain_loss_percentage: profit_or_loss_percentage,
+        shares_owned: shares_i_own
+      }
+
+      @total_money_i_spent += money_i_spent_on_this_stock
+      @total_current_value += current_worth_of_this_stock
+    end
+
+    @total_invested = @total_money_i_spent
+    @current_portfolio_value = @total_current_value
+    @total_gain_loss = @current_portfolio_value - @total_invested
+    @total_gain_loss_percentage = @total_invested > 0 ? ((@total_gain_loss / @total_invested) * 100) : 0
+  end
   private
 
   def require_approved_user

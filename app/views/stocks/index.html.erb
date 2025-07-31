@@ -1,22 +1,136 @@
-<h1>Stocks</h1>
-<table>
-  <thead>
-    <tr>
-      <th>Symbol</th>
-      <th>Name</th>
-      <th>Price</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @stocks.each do |stock| %>
-      <tr>
-        <td><%= stock.symbol %></td>
-        <td><%= stock.name %></td>
-        <td>
-          <% price = @latest_prices[stock.id] %>
-          <%= price ? number_to_currency(price) : "N/A" %>
-        </td>
-      </tr>
+<div class="max-w-7xl mx-auto">
+  <!-- Page Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-green-800 mb-2 flex items-center">
+      <span class="mr-3 text-green-600">📈</span>
+      Browse Stocks
+    </h1>
+    <p class="text-green-600">Search and discover stocks from AlphaVantage or browse your saved stocks</p>
+  </div>
+  <!-- Enhanced Search Section -->
+  <div class="bg-white rounded-xl shadow-lg p-6 mb-8 border border-green-100">
+    <h2 class="text-xl font-semibold text-green-800 mb-4 flex items-center">
+      <span class="mr-2">🔍</span>
+      Stock Search
+    </h2>
+    <%= form_with url: stocks_path, method: :get, local: true, class: "flex flex-col sm:flex-row gap-4" do %>
+      <div class="flex-1">
+        <%= text_field_tag :query, params[:query], 
+            placeholder: "Enter stock symbol (e.g. AAPL, TSLA, MSFT)", 
+            class: "w-full px-4 py-3 border border-green-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 transition-all duration-200" %>
+      </div>
+      <%= submit_tag "Search Stock", 
+          class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5" %>
     <% end %>
-  </tbody>
-</table>
+  </div>
+  <%# --- Enhanced Search Result and Buy Form --- %>
+  <% if @searched_stock_data.present? && @searched_stock_price.present? %>
+    <div class="bg-gradient-to-r from-green-50 to-green-100 border border-green-300 rounded-xl p-6 mb-8 shadow-lg">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-bold text-green-800 flex items-center">
+          <span class="mr-2">✅</span>
+          Search Result
+        </h2>
+        <span class="bg-green-200 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Live Data</span>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="space-y-3">
+          <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+            <span class="font-medium text-green-700">Symbol:</span>
+            <span class="font-bold text-green-900 text-lg"><%= params[:query].upcase %></span>
+          </div>
+          <div class="flex items-center justify-between p-3 bg-white rounded-lg">
+            <span class="font-medium text-green-700">Latest Price:</span>
+            <span class="font-bold text-green-900 text-xl"><%= number_to_currency(@searched_stock_price) %></span>
+          </div>
+        </div>
+        <div class="bg-white rounded-lg p-4">
+          <% if user_signed_in? %>
+            <h3 class="font-semibold text-green-800 mb-3">Quick Buy</h3>
+            <%= form_with url: trades_path, method: :post, local: true, class: "space-y-3" do %>
+              <%= hidden_field_tag :symbol, params[:query].upcase %>
+              <%= hidden_field_tag :price, @searched_stock_price %>
+              <div class="flex items-center space-x-3">
+                <label class="text-sm font-medium text-green-700">Quantity:</label>
+                <%= number_field_tag :quantity, 1, min: 1, 
+                    class: "border border-green-300 rounded-lg px-3 py-2 w-24 focus:ring-2 focus:ring-green-500" %>
+                <%= submit_tag "Buy Now", 
+                    class: "bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+              </div>
+              <p class="text-xs text-green-600">Total: <span id="total-cost"><%= number_to_currency(@searched_stock_price) %></span></p>
+            <% end %>
+          <% else %>
+            <div class="text-center p-4 bg-yellow-50 rounded-lg border border-yellow-200">
+              <p class="text-yellow-700 font-medium">Sign in to buy this stock</p>
+              <%= link_to "Sign In", new_user_session_path, class: "inline-block mt-2 bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg transition-all duration-200" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% elsif params[:query].present? %>
+    <div class="bg-red-50 border border-red-300 rounded-xl p-6 mb-8">
+      <div class="flex items-center">
+        <span class="mr-2 text-red-600">❌</span>
+        <span class="text-red-800 font-medium">No stock found for symbol "<%= params[:query].upcase %>"</span>
+      </div>
+      <p class="text-red-600 text-sm mt-2">Try searching for a different symbol or check the spelling.</p>
+    </div>
+  <% end %>
+  <%# --- Enhanced Table of All Stocks in Database --- %>
+  <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-green-100">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+      <h2 class="text-xl font-semibold text-white flex items-center">
+        <span class="mr-2">💼</span>
+        Your Owned Stocks
+        <span class="ml-2 bg-green-500 text-white px-2 py-1 rounded-full text-sm"><%= @stocks.count %></span>
+      </h2>
+    </div>
+    <% if @stocks.any? %>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-green-50">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Symbol</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Company Name</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Current Price</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-green-800">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-green-100">
+            <% @stocks.each_with_index do |stock, index| %>
+              <tr class="hover:bg-green-50 transition-colors duration-200 <%= index.even? ? 'bg-white' : 'bg-green-25' %>">
+                <td class="px-6 py-4">
+                  <%= link_to stock.symbol, stock_path(stock), 
+                      class: "font-bold text-green-700 hover:text-green-900 hover:underline transition-colors duration-200" %>
+                </td>
+                <td class="px-6 py-4 text-green-800"><%= stock.name %></td>
+                <td class="px-6 py-4">
+                  <% price = @latest_prices[stock.id] %>
+                  <% if price %>
+                    <span class="font-semibold text-green-900"><%= number_to_currency(price) %></span>
+                  <% else %>
+                    <span class="text-gray-500 italic">Loading...</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <div class="flex justify-center space-x-2">
+                    <%= link_to "View Details", stock_path(stock), 
+                        class: "bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 hover:shadow-sm" %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <div class="p-12 text-center">
+        <div class="text-6xl mb-4">📊</div>
+        <h3 class="text-xl font-semibold text-green-800 mb-2">No stocks saved yet</h3>
+        <p class="text-green-600 mb-4">Search for stocks above to get started with your trading journey!</p>
+      </div>
+    <% end %>
+  </div>
+</div>
+

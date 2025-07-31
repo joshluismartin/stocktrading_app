@@ -1,9 +1,84 @@
-<h1>Trader Details</h1>
-<p>Email: <%= @trader.email %></p>
-<p>Status: <%= @trader.status %></p>
-<p>Joined: <%= @trader.created_at.strftime("%Y-%m-%d") %></p>
-<%= link_to "Back to Traders", admin_traders_path %>
-<% if @trader.status == "pending" %>
-  | <%= link_to "Approve", approve_admin_trader_path(@trader), data: { turbo_method: :patch } %>
-<% end %>
-<%= link_to "Delete", admin_trader_path(@trader), data: { turbo_method: :delete, turbo_confirm: "Are you sure?" } %>
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-green-800 mb-2 flex items-center">
+          <span class="mr-3 text-green-600">👤</span>
+          Trader Details
+        </h1>
+        <p class="text-green-600">View and manage trader information</p>
+      </div>
+      <div>
+        <%= link_to "← Back to Traders", admin_traders_path, class: "bg-green-100 hover:bg-green-200 text-green-800 px-4 py-2 rounded-lg font-medium transition-all duration-200" %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trader Information Card -->
+  <div class="bg-white rounded-xl shadow-lg border border-green-100 mb-8">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-xl">
+      <h2 class="text-xl font-semibold text-white flex items-center">
+        <span class="mr-2">📋</span>
+        Trader Information
+      </h2>
+    </div>
+    
+    <div class="p-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-green-800 mb-1">Name</label>
+            <p class="text-lg text-green-900"><%= @trader.name.present? ? @trader.name : "Not provided" %></p>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-green-800 mb-1">Email</label>
+            <p class="text-lg text-green-900"><%= @trader.email %></p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-green-800 mb-1">Status</label>
+            <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium <%= @trader.status == 'approved' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+              <%= @trader.status.capitalize %>
+            </span>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-green-800 mb-1">Admin Status</label>
+            <span class="inline-flex px-3 py-1 rounded-full text-sm font-medium <%= @trader.admin? ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800' %>">
+              <%= @trader.admin? ? "Admin" : "Regular User" %>
+            </span>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-semibold text-green-800 mb-1">Joined Date</label>
+            <p class="text-lg text-green-900"><%= @trader.created_at.strftime("%B %d, %Y") %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex justify-center space-x-4">
+    <%= link_to edit_admin_trader_path(@trader), class: "bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" do %>
+      <span class="mr-2">✏️</span>
+      Edit Trader
+    <% end %>
+    
+    <% if @trader.status == "pending" %>
+      <%= link_to approve_admin_trader_path(@trader), data: { turbo_method: :patch }, class: "bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" do %>
+        <span class="mr-2">✅</span>
+        Approve Trader
+      <% end %>
+    <% end %>
+    
+    <%= link_to admin_trader_path(@trader), data: { turbo_method: :delete, turbo_confirm: "Are you sure you want to delete this trader?" }, class: "bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" do %>
+      <span class="mr-2">🗑️</span>
+      Delete Trader
+    <% end %>
+  </div>
+</div>

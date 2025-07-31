@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Confirm Your StockBit Account</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #16a34a, #15803d); color: white; padding: 30px; text-align: center; border-radius: 8px 8px 0 0; }
+    .content { background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb; }
+    .button { display: inline-block; background: #16a34a; color: white; padding: 15px 30px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+    .button:hover { background: #15803d; }
+    .footer { text-align: center; margin-top: 30px; color: #666; font-size: 14px; }
+    .security-note { background: #fef3c7; border: 1px solid #f59e0b; padding: 15px; border-radius: 6px; margin: 20px 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>📈 Welcome to StockBit!</h1>
+      <p>Please confirm your email address to get started</p>
+    </div>
+    
+    <div class="content">
+      <h2>Hello!</h2>
+      
+      <p>Thank you for signing up for StockBit! We're excited to have you join our trading community.</p>
+      
+      <p>To complete your registration and start trading, please confirm your email address by clicking the button below:</p>
+      
+      <div style="text-align: center;">
+        <%= link_to 'Confirm My Email Address', confirmation_url(@resource, confirmation_token: @token), class: 'button', style: 'color: white; text-decoration: none;' %>
+      </div>
+      
+      <div class="security-note">
+        <strong>🔒 Security Note:</strong> This confirmation link will expire in 24 hours for your security. If you didn't create an account with StockBit, please ignore this email.
+      </div>
+      
+      <p>Once confirmed, you'll be able to:</p>
+      <ul>
+        <li>🔍 Search and discover stocks with real-time data</li>
+        <li>💹 Execute buy and sell orders</li>
+        <li>📊 Track your portfolio performance</li>
+        <li>💰 Monitor gains and losses</li>
+      </ul>
+      
+      <p>If the button above doesn't work, you can copy and paste this link into your browser:</p>
+      <p style="word-break: break-all; color: #16a34a; font-size: 14px;">
+        <%= confirmation_url(@resource, confirmation_token: @token) %>
+      </p>
+      
+      <p>Welcome aboard!</p>
+      <p><strong>The StockBit Team</strong></p>
+    </div>
+    
+    <div class="footer">
+      <p>This email was sent to <%= @email %> because you signed up for a StockBit account.</p>
+      <p>If you didn't sign up, please ignore this email.</p>
+    </div>
+  </div>
+</body>
+</html>

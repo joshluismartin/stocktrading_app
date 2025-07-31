@@ -1,28 +1,205 @@
-<h1>My Portfolio</h1>
-<table>
-  <thead>
-    <tr>
-      <th>Stock</th>
-      <th>Shares Owned</th>
-      <th>Current Price</th>
-      <th>Total Value</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @portfolio.each do |stock_id, shares| %>
-      <tr>
-        <td><%= @stocks[stock_id].symbol if @stocks[stock_id] %></td>
-        <td><%= shares %></td>
-        <% price = @current_prices[stock_id] %>
-        <td><%= number_to_currency(price) if price %></td>
-        <td>
-          <% if price %>
-            <%= number_to_currency(price * shares) %>
-          <% else %>
-            N/A
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-green-800 mb-2 flex items-center">
+      <span class="mr-3 text-green-600">💼</span>
+      My Portfolio
+    </h1>
+    <p class="text-green-600">Track your investments and portfolio performance</p>
+  </div>
+
+  <!-- Portfolio Summary Stats -->
+  <% total_value = 0 %>
+  <% @portfolio.each do |stock_id, shares| %>
+    <% price = @current_prices[stock_id] %>
+    <% total_value += (price * shares) if price %>
+  <% end %>
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-100 text-sm font-medium">Total Portfolio Value</p>
+          <p class="text-3xl font-bold"><%= number_to_currency(total_value) %></p>
+        </div>
+        <div class="text-4xl opacity-80">💰</div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-600 text-sm font-medium">Total Holdings</p>
+          <p class="text-3xl font-bold text-green-800"><%= @portfolio.count %></p>
+        </div>
+        <div class="text-4xl text-green-500">📊</div>
+      </div>
+    </div>
+    
+    <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-green-600 text-sm font-medium">Total Shares</p>
+          <p class="text-3xl font-bold text-green-800"><%= number_with_delimiter(@portfolio.values.sum) %></p>
+        </div>
+        <div class="text-4xl text-green-500">📈</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Portfolio Performance -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-green-600 text-sm font-medium">Total Invested</p>
+        <p class="text-2xl font-bold text-green-800"><%= number_to_currency(@total_invested) %></p>
+      </div>
+      <div class="text-3xl text-blue-500">💰</div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-green-600 text-sm font-medium">Current Value</p>
+        <p class="text-2xl font-bold text-green-800"><%= number_to_currency(@current_portfolio_value) %></p>
+      </div>
+      <div class="text-3xl text-green-500">📈</div>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+    <div class="flex items-center justify-between">
+      <div>
+        <p class="text-sm font-medium <%= @total_gain_loss >= 0 ? 'text-green-600' : 'text-red-600' %>">
+          Total <%= @total_gain_loss >= 0 ? 'Gain' : 'Loss' %>
+        </p>
+        <p class="text-2xl font-bold <%= @total_gain_loss >= 0 ? 'text-green-800' : 'text-red-800' %>">
+          <%= @total_gain_loss >= 0 ? '+' : '' %><%= number_to_currency(@total_gain_loss) %>
+        </p>
+        <p class="text-sm <%= @total_gain_loss >= 0 ? 'text-green-600' : 'text-red-600' %>">
+          <%= @total_gain_loss >= 0 ? '+' : '' %><%= number_to_percentage(@total_gain_loss_percentage, precision: 2) %>
+        </p>
+      </div>
+      <div class="text-3xl <%= @total_gain_loss >= 0 ? 'text-green-500' : 'text-red-500' %>">
+        <%= @total_gain_loss >= 0 ? '📈' : '📉' %>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <!-- Portfolio Holdings -->
+  <div class="bg-white rounded-xl shadow-lg border border-green-100">
+    <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-xl">
+      <h2 class="text-xl font-semibold text-white flex items-center">
+        <span class="mr-2">💼</span>
+        Portfolio Holdings
+        <span class="ml-2 bg-green-500 text-white px-2 py-1 rounded-full text-sm"><%= @portfolio.count %></span>
+      </h2>
+    </div>
+
+    <% if @portfolio.any? %>
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-green-50">
+            <tr>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Stock</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Shares Owned</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Current Price</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Total Value</th>
+              <th class="px-6 py-4 text-left text-sm font-semibold text-green-800">Portfolio %</th>
+              <th class="px-6 py-4 text-center text-sm font-semibold text-green-800">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-green-100">
+            <% @portfolio.each_with_index do |(stock_id, shares), index| %>
+              <% stock = @stocks[stock_id] %>
+              <% price = @current_prices[stock_id] %>
+              <% holding_value = price ? (price * shares) : 0 %>
+              <% percentage = total_value > 0 ? ((holding_value / total_value) * 100) : 0 %>
+              
+              <tr class="hover:bg-green-50 transition-colors duration-200 <%= index.even? ? 'bg-white' : 'bg-green-25' %>">
+                <td class="px-6 py-4">
+                  <% if stock %>
+                    <div>
+                      <p class="font-bold text-green-800"><%= stock.symbol %></p>
+                      <p class="text-sm text-green-600"><%= stock.name %></p>
+                    </div>
+                  <% else %>
+                    <span class="text-gray-500">Unknown Stock</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <span class="font-bold text-green-900 text-lg"><%= number_with_delimiter(shares) %></span>
+                    <span class="text-sm text-green-600 ml-1">shares</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <% if price %>
+                    <div>
+                      <span class="font-semibold text-green-900"><%= number_to_currency(price) %></span>
+                      <p class="text-xs text-green-600">per share</p>
+                    </div>
+                  <% else %>
+                    <span class="text-gray-500 italic">Loading...</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4">
+                  <% if price %>
+                    <div>
+                      <span class="font-bold text-green-900 text-xl"><%= number_to_currency(holding_value) %></span>
+                    </div>
+                  <% else %>
+                    <span class="text-gray-500">N/A</span>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4">
+                  <div class="flex items-center">
+                    <div class="w-full bg-green-200 rounded-full h-2 mr-2">
+                      <div class="bg-green-600 h-2 rounded-full" style="width: <%= percentage.round(1) %>%"></div>
+                    </div>
+                    <span class="text-sm font-medium text-green-700"><%= percentage.round(1) %>%</span>
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-center">
+                  <% if stock %>
+                    <div class="flex justify-center space-x-2">
+                      <%= link_to "View Stock", stock_path(stock), class: "bg-green-100 hover:bg-green-200 text-green-800 px-3 py-1 rounded text-sm font-medium transition-all duration-200" %>
+                      <%= link_to "Trade", stock_path(stock), class: "bg-blue-100 hover:bg-blue-200 text-blue-800 px-3 py-1 rounded text-sm font-medium transition-all duration-200" %>
+                    </div>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Portfolio Actions -->
+      <div class="px-6 py-4 border-t border-green-100 bg-green-50">
+        <div class="flex justify-center space-x-4">
+          <%= link_to stocks_path, class: "bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" do %>
+            <span class="mr-2">🔍</span>
+            Browse More Stocks
           <% end %>
-        </td>
-      </tr>
+          <%= link_to trades_path, class: "bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md flex items-center" do %>
+            <span class="mr-2">📋</span>
+            View Trade History
+          <% end %>
+        </div>
+      </div>
+    <% else %>
+      <div class="p-12 text-center">
+        <div class="text-6xl mb-4">💼</div>
+        <h3 class="text-xl font-semibold text-green-800 mb-2">Your portfolio is empty</h3>
+        <p class="text-green-600 mb-6">Start building your investment portfolio by purchasing your first stocks!</p>
+        <div class="flex justify-center space-x-4">
+          <%= link_to "Browse Stocks", stocks_path, class: "bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+          <%= link_to "View Trades", trades_path, class: "bg-green-100 hover:bg-green-200 text-green-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+        </div>
+      </div>
     <% end %>
-  </tbody>
-</table>
+  </div>
+</div>

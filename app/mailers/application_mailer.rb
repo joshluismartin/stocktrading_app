@@ -1,4 +1,4 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "from@example.com"
+  default from: "StockBit Team <noreply@stockbit.com>"
   layout "mailer"
 end

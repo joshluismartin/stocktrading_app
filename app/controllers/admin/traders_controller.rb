@@ -17,7 +17,7 @@ class Admin::TradersController < ApplicationController
   def create
     @trader = User.new(trader_params)
     @trader.admin = false
-    @trader.status = "pending" # or "approved" if you want to skip approval
+    @trader.status = "pending"
     if @trader.save
       redirect_to admin_trader_path(@trader), notice: "Trader created successfully!"
     else
@@ -55,8 +55,21 @@ class Admin::TradersController < ApplicationController
 
   def approve
     @trader = User.find(params[:id])
-    @trader.update(status: "approved")
-    redirect_to admin_trader_path(@trader), notice: "Trader approved!"
+
+
+    was_pending = @trader.status == "pending"
+
+    if @trader.update(status: "approved")
+
+      if was_pending
+        TraderMailer.account_approved(@trader).deliver_now
+        redirect_to admin_trader_path(@trader), notice: "Trader approved and notification email sent!"
+      else
+        redirect_to admin_trader_path(@trader), notice: "Trader status updated!"
+      end
+    else
+      redirect_to admin_trader_path(@trader), alert: "Failed to approve trader."
+    end
   end
 
   private

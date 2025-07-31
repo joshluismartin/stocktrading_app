@@ -1,0 +1,21 @@
+Welcome to StockBit!
+
+Hello <%= @trader.name.present? ? @trader.name : @trader.email %>!
+
+Great news! Your StockBit trading account has been approved and is now ready for use.
+
+You can now:
+- Search and discover stocks with real-time data
+- Buy and sell stocks with our intelligent trading platform  
+- Track your portfolio performance with detailed analytics
+- Monitor your gains and losses in real-time
+
+Start trading now: <%= @login_url %>
+
+If you have any questions or need assistance, please don't hesitate to contact our support team.
+
+Happy trading!
+The StockBit Team
+
+---
+This email was sent to <%= @trader.email %> because your trading account was approved.

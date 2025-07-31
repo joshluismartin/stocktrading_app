@@ -22,4 +22,6 @@ Rails.application.routes.draw do
   end
 
   get "up" => "rails/health#show", as: :rails_health_check
+  get "/500", to: "errors#internal_server_error"
+  match "*path", to: "errors#errors", via: :all
 end

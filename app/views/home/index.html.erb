@@ -1,15 +1,209 @@
 <% if user_signed_in? %>
-  <h1>Welcome, <%= current_user.email %>!</h1>
-  <p>Status: <%= current_user.status.capitalize %></p>
-  <% if current_user.confirmed? %>
-    <p>Email confirmed!</p>
-  <% else %>
-    <p>Please confirm your email address.</p>
-  <% end %>
-  <%= link_to "My Trades", trades_path %> |
-  <%= link_to "Portfolio", portfolio_path %>
+  <div class="max-w-7xl mx-auto">
+    <!-- Welcome Header -->
+    <div class="mb-8">
+      <h1 class="text-4xl font-bold text-green-800 mb-2">
+        Welcome back, <%= current_user.name.present? ? current_user.name : current_user.email.split('@').first.capitalize %>! 👋
+      </h1>
+      <div class="flex items-center space-x-4 text-green-600">
+        <% if current_user.confirmed? %>
+          <span class="flex items-center text-green-600">
+            ✅ Email Verified
+          </span>
+        <% else %>
+          <span class="flex items-center text-yellow-600">
+            ⚠️ Please confirm your email
+          </span>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <!-- Balance Card -->
+      <div class="bg-gradient-to-r from-green-500 to-green-600 rounded-xl p-6 text-white shadow-lg">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-100 text-sm font-medium">Available Balance</p>
+            <p class="text-2xl font-bold"><%= number_to_currency(current_user.balance) %></p>
+          </div>
+          <div class="text-3xl opacity-80">💰</div>
+        </div>
+      </div>
+
+      <!-- Total Trades Card -->
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-600 text-sm font-medium">Total Trades</p>
+            <p class="text-2xl font-bold text-green-800"><%= @total_trades || current_user.trades.count %></p>
+          </div>
+          <div class="text-3xl text-green-500">📈</div>
+        </div>
+      </div>
+
+      <!-- Portfolio Performance Card -->
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+        <h3 class="text-lg font-semibold text-green-800 mb-4 flex items-center">
+          <span class="mr-2">📊</span>
+          Portfolio Performance
+        </h3>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-green-600">Total Invested:</span>
+            <span class="font-bold text-green-800"><%= number_to_currency(@total_invested || 0) %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-green-600">Current Value:</span>
+            <span class="font-bold text-green-800"><%= number_to_currency(@current_portfolio_value || 0) %></span>
+          </div>
+          <div class="flex justify-between border-t border-green-200 pt-2">
+            <span class="<%= (@total_gain_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600' %>">
+              Total <%= (@total_gain_loss || 0) >= 0 ? 'Gain' : 'Loss' %>:
+            </span>
+            <div class="text-right">
+              <span class="font-bold <%= (@total_gain_loss || 0) >= 0 ? 'text-green-800' : 'text-red-800' %>">
+                <%= (@total_gain_loss || 0) >= 0 ? '+' : '' %><%= number_to_currency(@total_gain_loss || 0) %>
+              </span>
+              <p class="text-sm <%= (@total_gain_loss || 0) >= 0 ? 'text-green-600' : 'text-red-600' %>">
+                <%= (@total_gain_loss_percentage || 0) >= 0 ? '+' : '' %><%= number_to_percentage(@total_gain_loss_percentage || 0, precision: 2) %>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Invested Card -->
+      <div class="bg-white rounded-xl p-6 shadow-lg border border-green-100">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-green-600 text-sm font-medium">Total Invested</p>
+            <p class="text-2xl font-bold text-green-800">
+              <%= number_to_currency(@total_invested || current_user.trades.where(trade_type: 'buy').sum('quantity * price')) %>
+            </p>
+          </div>
+          <div class="text-3xl text-green-500">📊</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Content -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <!-- Recent Trades -->
+      <div class="bg-white rounded-xl shadow-lg border border-green-100">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-xl">
+          <h2 class="text-xl font-semibold text-white flex items-center">
+            <span class="mr-2">🔄</span>
+            Recent Trades
+          </h2>
+        </div>
+        <div class="p-6">
+          <% recent_trades = @recent_trades || current_user.trades.includes(:stock).order(created_at: :desc).limit(5) %>
+          <% if recent_trades.any? %>
+            <div class="space-y-4">
+              <% recent_trades.each do |trade| %>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 <%= trade.trade_type == 'buy' ? 'bg-green-500' : 'bg-red-500' %> rounded-full flex items-center justify-center">
+                      <span class="text-white text-sm font-bold"><%= trade.trade_type == 'buy' ? '+' : '-' %></span>
+                    </div>
+                    <div>
+                      <p class="font-medium text-green-800"><%= trade.stock.symbol %></p>
+                      <p class="text-sm text-green-600"><%= trade.quantity %> shares</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-semibold text-green-800"><%= number_to_currency(trade.price * trade.quantity) %></p>
+                    <p class="text-xs text-green-600"><%= time_ago_in_words(trade.created_at) %> ago</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            <div class="mt-4 text-center">
+              <%= link_to "View All Trades", trades_path, class: "text-green-600 hover:text-green-800 font-medium" %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <div class="text-4xl mb-2">📈</div>
+              <p class="text-green-600 mb-4">No trades yet</p>
+              <%= link_to "Start Trading", stocks_path, class: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Portfolio Holdings -->
+      <div class="bg-white rounded-xl shadow-lg border border-green-100">
+        <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4 rounded-t-xl">
+          <h2 class="text-xl font-semibold text-white flex items-center">
+            <span class="mr-2">💼</span>
+            Portfolio Holdings
+          </h2>
+        </div>
+        <div class="p-6">
+          <% if defined?(@portfolio_holdings) && @portfolio_holdings&.any? %>
+            <div class="space-y-4">
+              <% @portfolio_holdings.each do |stock, quantity| %>
+                <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                  <div>
+                    <p class="font-medium text-green-800"><%= stock.symbol %></p>
+                    <p class="text-sm text-green-600"><%= stock.name %></p>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-semibold text-green-800"><%= quantity %> shares</p>
+                    <p class="text-xs text-green-600">Current holding</p>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+            <div class="mt-4 text-center">
+              <%= link_to "View Full Portfolio", portfolio_path, class: "text-green-600 hover:text-green-800 font-medium" %>
+            </div>
+          <% else %>
+            <div class="text-center py-8">
+              <div class="text-4xl mb-2">📊</div>
+              <p class="text-green-600 mb-4">No holdings yet</p>
+              <%= link_to "Browse Stocks", stocks_path, class: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-all duration-200" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
 <% else %>
-  <h1>Welcome to StockTrading App!</h1>
-  <%= link_to "Sign In", new_user_session_path %> or
-  <%= link_to "Sign Up", new_user_registration_path %>
+  <!-- Landing Page for Non-Signed In Users -->
+  <div class="max-w-4xl mx-auto text-center">
+    <div class="mb-12">
+      <h1 class="text-5xl font-bold text-green-800 mb-4">Welcome to StockBit! 📈</h1>
+      <p class="text-xl text-green-600 mb-8">Your gateway to smart stock trading and portfolio management</p>
+      
+      <div class="flex justify-center space-x-4">
+        <%= link_to "Get Started", new_user_registration_path, class: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white px-8 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-lg transform hover:-translate-y-0.5" %>
+        <%= link_to "Sign In", new_user_session_path, class: "bg-white hover:bg-green-50 text-green-700 px-8 py-3 rounded-lg font-medium border border-green-300 transition-all duration-200 hover:shadow-md" %>
+      </div>
+    </div>
+    
+    <!-- Features Grid -->
+    <div class="grid md:grid-cols-3 gap-8 mt-16">
+      <div class="text-center p-6">
+        <div class="text-4xl mb-4">🔍</div>
+        <h3 class="text-xl font-semibold text-green-800 mb-2">Discover Stocks</h3>
+        <p class="text-green-600">Search and explore stocks with real-time data from AlphaVantage</p>
+      </div>
+      
+      <div class="text-center p-6">
+        <div class="text-4xl mb-4">💹</div>
+        <h3 class="text-xl font-semibold text-green-800 mb-2">Smart Trading</h3>
+        <p class="text-green-600">Buy and sell stocks with intelligent portfolio management</p>
+      </div>
+      
+      <div class="text-center p-6">
+        <div class="text-4xl mb-4">📊</div>
+        <h3 class="text-xl font-semibold text-green-800 mb-2">Track Performance</h3>
+        <p class="text-green-600">Monitor your investments with detailed analytics and insights</p>
+      </div>
+    </div>
+  </div>
 <% end %>

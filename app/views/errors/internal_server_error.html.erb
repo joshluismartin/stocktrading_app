@@ -1,0 +1,17 @@
+<div class="max-w-4xl mx-auto text-center py-16">
+  <div class="bg-white rounded-xl shadow-lg border border-red-200 p-12">
+    <div class="text-8xl mb-6">⚠️</div>
+    <h1 class="text-4xl font-bold text-red-800 mb-4">Internal Server Error</h1>
+    <p class="text-xl text-red-600 mb-8">
+      Something went wrong on our end. We're working to fix this issue.
+    </p>
+    <div class="space-y-4 text-red-700">
+      <p>Error Code: 500</p>
+      <p>Please try again in a few moments, or contact support if the problem persists.</p>
+    </div>
+    <div class="mt-8 flex justify-center space-x-4">
+      <%= link_to "← Go Back", "javascript:history.back()", class: "bg-red-100 hover:bg-red-200 text-red-800 px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+      <%= link_to "🏠 Home", root_path, class: "bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 hover:shadow-md" %>
+    </div>
+  </div>
+</div>

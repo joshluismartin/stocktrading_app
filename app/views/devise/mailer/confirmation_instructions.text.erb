@@ -1,0 +1,24 @@
+Welcome to StockBit!
+
+Hello!
+
+Thank you for signing up for StockBit! We're excited to have you join our trading community.
+
+To complete your registration and start trading, please confirm your email address by visiting this link:
+
+<%= confirmation_url(@resource, confirmation_token: @token) %>
+
+SECURITY NOTE: This confirmation link will expire in 24 hours for your security. If you didn't create an account with StockBit, please ignore this email.
+
+Once confirmed, you'll be able to:
+- Search and discover stocks with real-time data
+- Execute buy and sell orders
+- Track your portfolio performance
+- Monitor gains and losses
+
+Welcome aboard!
+The StockBit Team
+
+---
+This email was sent to <%= @email %> because you signed up for a StockBit account.
+If you didn't sign up, please ignore this email.

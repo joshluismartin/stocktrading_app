@@ -55,12 +55,9 @@ class Admin::TradersController < ApplicationController
 
   def approve
     @trader = User.find(params[:id])
-
-
     was_pending = @trader.status == "pending"
 
     if @trader.update(status: "approved")
-
       if was_pending
         TraderMailer.account_approved(@trader).deliver_now
         redirect_to admin_trader_path(@trader), notice: "Trader approved and notification email sent!"

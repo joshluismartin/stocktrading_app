@@ -1,5 +1,6 @@
 class StocksController < ApplicationController
   before_action :authenticate_user!
+
   def index
     if params[:query].present?
       @searched_stock_data = AlphaVantage.get_stock_price(params[:query])

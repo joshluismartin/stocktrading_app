@@ -162,6 +162,7 @@ class TradesController < ApplicationController
     @total_gain_loss = @current_portfolio_value - @total_invested
     @total_gain_loss_percentage = @total_invested > 0 ? ((@total_gain_loss / @total_invested) * 100) : 0
   end
+
   private
 
   def require_approved_user

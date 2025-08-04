@@ -75,6 +75,7 @@ end
 
 group :development, :test do
   gem "rspec-rails", "~> 7.1"
+  gem "rails-controller-testing"
 end
 
 group :development do
